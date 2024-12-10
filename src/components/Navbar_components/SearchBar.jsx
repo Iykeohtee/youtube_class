@@ -2,30 +2,57 @@
 
 import React from 'react'
 import { SearchVidoes } from '@/utils/fetchData'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import Image from 'next/image'
+import { SearchContext } from '@/contexts/SearchContext'
 
-const SearchBar = () => {
+const SearchBar = () => {   
 
-     const [ count, setCount ] = useState(0);
+  const { result, setResult } = useContext(SearchContext);      
 
-    function update() {
-        setCount(count+1)  
-    }
+  const [ loading, setLoading ] = useState(false)         
+  const [ ask, setAsk ] = useState("")
+
+  const handleSearch = async (e) => {   
+      e.preventDefault();   
+      setLoading(true)    
+
+      const data = await SearchVidoes(`search/?query=${ask}`)   
+      console.log(data)  
+      setResult(data.videos)      
+      setLoading(false)  
+  }
 
   return (
     <div>
-    <form>
-    <input type="text" placeholder='Search..'/>
+
+    <form onSubmit={handleSearch}> 
+
+    <input type="text" placeholder='Search..'
+      value={ask} 
+       onChange={(e) => setAsk(e.target.value)}   
+    />
     <button>
         Search
     </button>
+
     </form>
 
-      <h1>{count} </h1>  
-      <button onClick={update}> 
-        Update count
-      </button>
-    </div>
+    {
+      loading ? <p>Loading...</p> : null 
+    }
+
+
+    {/* {
+      result.map((eachItem, index, array) => (
+         <div key={index}> 
+          <h1>{eachItem.title}</h1>
+          <img src={eachItem.thumbnails[0].url} alt="image" />   
+         </div>
+      ))
+    } */}
+
+    </div>  
   )
 }
    
